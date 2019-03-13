@@ -2,7 +2,7 @@
 arr: .word 1 2 3
 
 
-arr: .word 1 2 3
+arr2: .word 10 20 3
 
 .text
 la x10 arr #start address
