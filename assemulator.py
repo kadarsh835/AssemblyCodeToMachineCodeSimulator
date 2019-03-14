@@ -21,7 +21,7 @@ if file_read.mode=='r':
         for i in range(len(instructions) - 1, -1, -1):
             if(instructions[i]==''):                                                    #removal of '\n's
                 del instructions[i]
-            else:
+            else:#check
                 dictionary[instructions[i][:instructions[i].find(':')].strip()] = hex(data_address)
                 for word in (instructions[i][instructions[i].find('.word'):].strip()).split():
                     try:
