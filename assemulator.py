@@ -8,7 +8,7 @@ if file_read.mode=='r':
         text = ''
         
         if asm_code.find(".data") < asm_code.find('.text') :
-            data = asm_code[asm_code.find(".data")+5:asm_code.find(".text")].strip()        #Sheky will look into for 5
+            data = asm_code[asm_code.find(".data")+5:asm_code.find(".text")].strip()        #Sheky have looked into for 5
             text = asm_code[asm_code.find('.text')+5:].strip()
         else:
             text = asm_code[asm_code.find('.text')+5:asm_code.find('.data')].strip()
@@ -46,7 +46,7 @@ if file_read.mode=='r':
             words=instruction.split(' ')
             
             if(words[0] == 'lw'):
-                pass                    
+                pass
 
 
     else:
