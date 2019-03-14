@@ -14,7 +14,7 @@ if file_read.mode=='r':
             else:
                 dictionary[instructions[i][:instructions[i].find(':')].strip()] = hex(data_address)
                 for word in (instructions[i][instructions[i].find('.word'):].strip()).split():
-                    try:#we are never ever ever getting back together
+                    try:
                         file_write.write(str(hex(data_address))+' '+str(hex(int(word)))+'\n')
                         data_address=data_address+4
                     except: pass
