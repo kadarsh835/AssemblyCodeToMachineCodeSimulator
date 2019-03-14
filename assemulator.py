@@ -2,7 +2,7 @@ file_read = open("read_file.asm","r")
 file_write= open("write_file.mc","w+")
 if file_read.mode=='r':
     asm_code=file_read.read()
-    # assuming .data will always be above .text
+    # .data and .text part of the code can come in any order
     if(asm_code.find('.data') >= 0):
         data = ''
         text = ''
@@ -37,7 +37,18 @@ if file_read.mode=='r':
         print(instructions)
         print(dictionary)
 
-            #Handling of Data part ends here
+        # Handling of text part ends here
+        instructions = text.split('\n')
+        for instruction in instructions:
+            instruction=instruction.replace(', ', ' ')
+            instruction=instruction.replace(' ,', ' ')
+            instruction=instruction.replace(',', ' ')
+            words=instruction.split(' ')
+            
+            if(words[0] == 'lw'):
+                pass                    
+
+
     else:
         pass
 
