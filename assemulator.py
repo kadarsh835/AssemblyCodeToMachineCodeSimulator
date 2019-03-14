@@ -21,18 +21,20 @@ if file_read.mode=='r':
         for i in range(len(instructions) - 1, -1, -1):
             if(instructions[i]==''):                                                    #removal of '\n's
                 del instructions[i]
-            else:#check1
+            else:
                 dictionary[instructions[i][:instructions[i].find(':')].strip()] = hex(data_address)
-                for word in (instructions[i][instructions[i].find('.word'):].strip()).split():
-                    try:
-                        file_write.write(str(hex(data_address))+' '+str(hex(int(word)))+'\n')
-                        data_address=data_address+4
-                    except: pass
-                for byte in (instructions[i][instructions[i].find('.byte'):].strip()).split():
-                    try:
-                        file_write.write(str(hex(data_address))+' '+str(hex(int(byte)))+'\n')
-                        data_address=data_address+1
-                    except: pass
+                if instructions[i].find('.word')>=0:
+                    for word in (instructions[i][instructions[i].find('.word'):].strip()).split():
+                        try:
+                            file_write.write(str(hex(data_address))+' '+str(hex(int(word)))+'\n')
+                            data_address=data_address+4
+                        except: pass
+                if instructions[i].find('.byte')>=0:
+                    for byte in (instructions[i][instructions[i].find('.byte'):].strip()).split():
+                        try:
+                            file_write.write(str(hex(data_address))+' '+str(hex(int(byte)))+'\n')
+                            data_address=data_address+1
+                        except: pass
                 #file_write.write(hex(data_address)+' \n')
         print(instructions)
         print(dictionary)
