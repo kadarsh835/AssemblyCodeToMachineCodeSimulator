@@ -61,6 +61,6 @@ if file_read.mode=='r':
 #     for line in instructions:
 #         line=line.replace(', ',' ')
 #         line=line.replace(' ,',' ')
-#         line=line.replace(',',' ')
+#         line=line.replace(',',' ')#abc
 #         words=line.split(' ')
 #         print(words)
