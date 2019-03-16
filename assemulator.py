@@ -1,3 +1,4 @@
+from bitstring import BitArray
 
 mnemonic_fmt = {
     'lb':['I', '0000011', '000'],
@@ -60,8 +61,73 @@ mnemonic_fmt = {
     'CSRRSI':['I', '1110011', '110'],
     'CSRRCI':['I', '1110011', '111'],
 }
+
+def R_type(instruction):
+    words=instruction.split(' ')
+    opcode=mnemonic_fmt[words[0]][1]
+    funct3=mnemonic_fmt[words[0]][2]
+    funct7=mnemonic_fmt[words[0]][3]
+
+    rd='{0:05b}'.format(int(words[1][1:]))
+    rs1='{0:05b}'.format(int(words[2][1:]))
+    rs2='{0:05b}'.format(int(words[3][1:]))
+
+    machine_code=funct7 + rs2 + rs1 + funct3 + opcode
+    return machine_code
+
+def I_type(instruction):
+    words=instruction.split(' ')
+    opcode=mnemonic_fmt[words[0]][1]
+    funct3=mnemonic_fmt[words[0]][2]
+    rd='{0:05b}'.format(int(words[1][1:]))
+    rs1='{0:05b}'.format(int(words[2][1:]))
+    imm=''
+
+    if(words[3][0:2] == '0x'):
+        imm='{0:012b}'.format(int(words[3][2:], 16))
+
+    elif(words[3][0:2] == '0b'):
+        imm='{0:012b}'.format(int(words[3][2:], 2))
+
+    else:
+        imm=BitArray(int=int(words[3]), length=12).bin
+
+    machine_code = imm + rs1 + funct3 + rd + opcode
+    return machine_code
+
+def S_type(instruction):
+    words=instruction.split(' ')
+    opcode=mnemonic_fmt[words[0]][1]
+    funct3=mnemonic_fmt[words[0]][2]
+    rd='{0:05b}'.format(int(words[1][1:]))
+    rs1='{0:05b}'.format(int(words[2][1:]))
+    imm=''
+
+    if(words[3][0:2] == '0x'):
+        imm='{0:012b}'.format(int(words[3][2:], 16))
+
+    elif(words[3][0:2] == '0b'):
+        imm='{0:012b}'.format(int(words[3][2:], 2))
+        
+    else:
+        imm=BitArray(int=int(words[3]), length=12).bin
+
+    machine_code = imm + rs1 + funct3 + rd + opcode
+    return machine_code
+
+
+def Sb_type():
+    pass
+
+def U_type():
+    pass
+
+def Uj_type():
+    pass
+
 def converter(instruction):
-    if():
+    if(1):
+        pass
 
 
 
@@ -123,12 +189,7 @@ if file_read.mode=='r':
             
             if(words[0] == 'lw'):
                 registers[words[1]] = dictionary[words[2]]
-
-
-
-            elif(words[0] == 'add'):
-                pass
-            
+                MACHINE_CODE += 
 
 
 
@@ -142,6 +203,6 @@ if file_read.mode=='r':
 #     for line in instructions:
 #         line=line.replace(', ',' ')
 #         line=line.replace(' ,',' ')
-#         line=line.replace(',',' ')#abc
+#         line=line.replace(',',' ')
 #         words=line.split(' ')
 #         print(words)
