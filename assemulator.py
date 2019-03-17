@@ -1,5 +1,6 @@
 from bitstring import BitArray
 
+
 mnemonic_fmt = {
     'lb':['I', '0000011', '000'],
     'lh':['I', '0000011', '001'],
@@ -63,7 +64,7 @@ mnemonic_fmt = {
 }
 
 def R_type(instruction):
-    words=instruction.split(' ')
+    words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     funct7=mnemonic_fmt[words[0]][3]
@@ -76,7 +77,7 @@ def R_type(instruction):
     return machine_code
 
 def I_type(instruction):
-    words=instruction.split(' ')
+    words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     rd='{0:05b}'.format(int(words[1][1:]))
@@ -96,34 +97,60 @@ def I_type(instruction):
     return machine_code
 
 def S_type(instruction):
-    words=instruction.split(' ')
+    words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
-    rd='{0:05b}'.format(int(words[1][1:]))
-    rs1='{0:05b}'.format(int(words[2][1:]))
+    rs1='{0:05b}'.format(int(words[1][1:]))
+
+    temp_str=''
+    # third word should be in the format like 986(x7)
+    for i in range(2, len(words)):
+        temp_str += words[i]
+
+    offset = temp_str[0:temp_str.find('(')]
+    rs2=temp_str[temp_str('(')+2:temp_str(')')]
+
     imm=''
+    if(offset[0:2] == '0x'):
+        imm='{0:012b}'.format(int(offset[2:], 16))
 
-    if(words[3][0:2] == '0x'):
-        imm='{0:012b}'.format(int(words[3][2:], 16))
-
-    elif(words[3][0:2] == '0b'):
-        imm='{0:012b}'.format(int(words[3][2:], 2))
+    elif(offset[0:2] == '0b'):
+        imm='{0:012b}'.format(int(offset[2:], 2))
         
     else:
-        imm=BitArray(int=int(words[3]), length=12).bin
+        imm=BitArray(int=int(offset), length=12).bin
 
-    machine_code = imm + rs1 + funct3 + rd + opcode
+    machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
     return machine_code
 
 
-def Sb_type():
-    pass
+def SB_type(instruction, label_int):
+    words=instruction.split()
+    opcode=mnemonic_fmt[words[0]][1]
+    funct3=mnemonic_fmt[words[0]][2]
+    rs1='{0:05b}'.format(int(words[1][1:]))
+    rs2='{0:05b}'.format(int(words[2][1:]))
 
-def U_type():
-    pass
+    imm=BitArray(int=int(str(label_int)), length=12).bin
 
-def Uj_type():
-    pass
+    machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
+    return machine_code
+
+def U_type(instruction, var_address):
+    words=instruction.split()
+    opcode=mnemonic_fmt[words[0]][1]
+    rd='{0:05b}'.format(int(words[1][1:]))
+    
+    machine_code = var_address + rd + opcode
+    return machine_code
+
+def UJ_type(instruction, label_address):
+    words=instruction.split()
+    opcode=mnemonic_fmt[words[0]][1]
+    rd='{0:05b}'.format(int(words[1][1:]))
+
+    machine_code = label_address + rd + opcode
+    return machine_code
 
 def converter(instruction):
     if(1):

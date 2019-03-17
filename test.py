@@ -99,6 +99,34 @@ def I_type(instruction):
     machine_code = imm + rs1 + funct3 + rd + opcode
     return machine_code
 
+def S_type(instruction):
+    words=instruction.split()
+    opcode=mnemonic_fmt[words[0]][1]
+    funct3=mnemonic_fmt[words[0]][2]
+    rs1='{0:05b}'.format(int(words[1][1:]))
+
+    temp_str=''
+    # third word should be in the format like 986(x7)
+    for i in range(2, len(words)):
+        temp_str += words[i]
+
+    offset = temp_str[0:temp_str.find('(')]
+    rs2=temp_str[temp_str.find('(')+2:temp_str.find(')')]
+    rs2='{0:05b}'.format(int(rs2))
+
+    imm=''
+    if(offset[0:2] == '0x'):
+        imm='{0:012b}'.format(int(offset[2:], 16))
+
+    elif(offset[0:2] == '0b'):
+        imm='{0:012b}'.format(int(offset[2:], 2))
+        
+    else:
+        imm=BitArray(int=int(offset), length=12).bin
+
+    machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
+    return machine_code
+
 
 a=input('Enter input : ')
-print(I_type(a))
+print(S_type(a))
