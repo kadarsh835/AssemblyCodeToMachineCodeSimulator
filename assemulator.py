@@ -63,8 +63,8 @@ mnemonic_fmt = {
     'CSRRCI':['I', '1110011', '111'],
 }
 
-def R_type(instruction):
-    words=instruction.split()
+def R_type(words):
+    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     funct7=mnemonic_fmt[words[0]][3]
@@ -73,11 +73,11 @@ def R_type(instruction):
     rs1='{0:05b}'.format(int(words[2][1:]))
     rs2='{0:05b}'.format(int(words[3][1:]))
 
-    machine_code=funct7 + rs2 + rs1 + funct3 + opcode
+    machine_code=funct7 + rs2 + rs1 + funct3 + rd + opcode
     return machine_code
 
-def I_type(instruction):
-    words=instruction.split()
+def I_type(words):
+    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     rd='{0:05b}'.format(int(words[1][1:]))
@@ -96,8 +96,8 @@ def I_type(instruction):
     machine_code = imm + rs1 + funct3 + rd + opcode
     return machine_code
 
-def S_type(instruction):
-    words=instruction.split()
+def S_type(words):
+    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     rs1='{0:05b}'.format(int(words[1][1:]))
@@ -124,47 +124,40 @@ def S_type(instruction):
     return machine_code
 
 
-def SB_type(instruction, label_int):
-    words=instruction.split()
+def SB_type(words, label_offset):
+    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     rs1='{0:05b}'.format(int(words[1][1:]))
     rs2='{0:05b}'.format(int(words[2][1:]))
 
-    imm=BitArray(int=int(str(label_int)), length=12).bin
+    label_offset = label_offset
+    imm=BitArray(int=int(str(label_offset)), length=12).bin
 
     machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
     return machine_code
 
-def U_type(instruction, var_address):
-    words=instruction.split()
+def U_type(words, var_address):
+    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     rd='{0:05b}'.format(int(words[1][1:]))
     
     machine_code = var_address + rd + opcode
     return machine_code
 
-def UJ_type(instruction, label_address):
-    words=instruction.split()
+def UJ_type(words, label_address):
+#    words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     rd='{0:05b}'.format(int(words[1][1:]))
 
     machine_code = label_address + rd + opcode
     return machine_code
 
-def converter(instruction):
-    if(1):
-        pass
-
-
-
-file_read = open("read_file.asm","r")
 file_write= open("write_file.mc","w+")
+file_read = open("read_file.asm","r")
+
 if file_read.mode=='r':
     asm_code=file_read.read()
-    registers = {'x0':0, 'x1':0, 'x2':2147483632, 'x3':268435456, 'x4':0, 'x5':0, 'x6':0, 'x7':0, 'x8':0, 'x9':0, 'x10':0, 'x11':0, 'x12':0, 'x13':0, 'x14':0, 'x15':0, 'x16':0, 'x17':0, 'x18':0, 'x19':0, 'x20':0, 'x21':0, 'x22':0, 'x23':0, 'x24':0, 'x25':0, 'x26':0, 'x27':0, 'x28':0, 'x29':0, 'x30':0, 'x31':0}
-    print(len(registers))
-    print(registers)
     # .data and .text part of the code can come in any order
     if(asm_code.find('.data') >= 0):
         data = ''
@@ -203,22 +196,57 @@ if file_read.mode=='r':
         print(dictionary)
 
         # Handling of text part ends here
-        registers = {'x0':0, 'x1':0, 'x2':2147483632, 'x3':268435456, 'x4':0, 'x5':0, 'x6':0, 'x7':0, 'x8':0, 'x9':0, 'x10':0, 'x11':0, 'x12':0, 'x13':0, 'x14':0, 'x15':0, 'x16':0, 'x17':0, 'x18':0, 'x19':0, 'x20':0, 'x21':0, 'x22':0, 'x23':0, 'x24':0, 'x25':0, 'x26':0, 'x27':0, 'x28':0, 'x29':0, 'x30':0, 'x31':0}
-        MACHINE_CODE=''
-        print(len(registers))
-        print(registers)
-        instructions = text.split('\n')
-        for instruction in instructions:
-            instruction=instruction.replace(', ', ' ')
-            instruction=instruction.replace(' ,', ' ')
-            instruction=instruction.replace(',', ' ')
-            words=instruction.split(' ')
-            
-            if(words[0] == 'lw'):
-                registers[words[1]] = dictionary[words[2]]
-                MACHINE_CODE += 
+        #registers = {'x0':0, 'x1':0, 'x2':2147483632, 'x3':268435456, 'x4':0, 'x5':0, 'x6':0, 'x7':0, 'x8':0, 'x9':0, 'x10':0, 'x11':0, 'x12':0, 'x13':0, 'x14':0, 'x15':0, 'x16':0, 'x17':0, 'x18':0, 'x19':0, 'x20':0, 'x21':0, 'x22':0, 'x23':0, 'x24':0, 'x25':0, 'x26':0, 'x27':0, 'x28':0, 'x29':0, 'x30':0, 'x31':0}
+        #print(len(registers))
+        #print(registers)
 
+        instructions = list(filter(bool, text.splitlines()))
+        # Assuming there is no extra '\n' in the text part of the code
+        n=len(instructions)
+        
+        label_position={}
+        for i in range(0, n):
+            k=instructions[i].find(':')
+            if (k > 0):
+                instructions[i]=instructions[i].strip()
+                label_position[instructions[i][:k-1]]=i
 
+        for i in range(0, n):
+            instructions[i]=instructions[i].replace(',', ' ')
+            words=instructions[i].split()
+
+            pc=hex(i*4)+' '
+            if(mnemonic_fmt[words[0]][0] == 'R'):
+                file_write.write(pc)
+                print('0x' + '{0:08x}'.format(int(R_type(words), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(R_type(words), 2)))
+                file_write.write('\n')
+            elif(mnemonic_fmt[words[0]][0] == 'I'):
+                file_write.write(pc)
+                print('0x' + '{0:08x}'.format(int(I_type(words), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(I_type(words), 2)))
+                file_write.write('\n')
+            elif(mnemonic_fmt[words[0]][0] == 'S'):
+                file_write.write(pc)
+                print('0x' + '{0:08x}'.format(int(S_type(words), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(S_type(words), 2)))
+                file_write.write('\n')
+            elif(mnemonic_fmt[words[0]][0] == 'SB'):
+                var=(label_position[words[3]]-i)*4
+                file_write.write(pc)
+                print('0x' + '{0:08x}'.format(int(SB_type(words, var), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(SB_type(words, var))))
+                file_write.write('\n')
+            elif(mnemonic_fmt[words[0]][0] == 'U'):
+                file_write.write(pc)
+                print('0x' + '{0:08x}'.format(int(U_type(words, '10101'), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(U_type(words, '10101'), 2)))
+                file_write.write('\n')
+            elif(mnemonic_fmt[words[0]][0] == 'UJ'):
+                file_write.write(pc)
+                print('0x' + '{0:08x}'.format(int(UJ_type(words, '10101'), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(UJ_type(words, '10101'), 2)))
+                file_write.write('\n')
 
     else:
         pass
