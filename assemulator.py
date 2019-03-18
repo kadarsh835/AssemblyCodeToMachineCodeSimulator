@@ -108,7 +108,8 @@ def S_type(words):
         temp_str += words[i]
 
     offset = temp_str[0:temp_str.find('(')]
-    rs2=temp_str[temp_str('(')+2:temp_str(')')]
+    # handling of -ve offset left
+    rs2=temp_str[temp_str.find('(')+2:temp_str.find(')')]
 
     imm=''
     if(offset[0:2] == '0x'):
@@ -131,7 +132,6 @@ def SB_type(words, label_offset):
     rs1='{0:05b}'.format(int(words[1][1:]))
     rs2='{0:05b}'.format(int(words[2][1:]))
 
-    label_offset = label_offset
     imm=BitArray(int=int(str(label_offset)), length=12).bin
 
     machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
@@ -145,7 +145,7 @@ def U_type(words, var_address):
     machine_code = var_address + rd + opcode
     return machine_code
 
-def UJ_type(words, label_address):
+def UJ_type(words, label_address):  #write immediate in proper format
 #    words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     rd='{0:05b}'.format(int(words[1][1:]))
@@ -153,7 +153,7 @@ def UJ_type(words, label_address):
     machine_code = label_address + rd + opcode
     return machine_code
 
-file_write= open("write_file.mc","w+")
+file_write= open("write_file.mc","w")
 file_read = open("read_file.asm","r")
 
 if file_read.mode=='r':
@@ -206,10 +206,12 @@ if file_read.mode=='r':
         
         label_position={}
         for i in range(0, n):
+            instructions[i]=instructions[i].strip()
             k=instructions[i].find(':')
+            label=instructions[i][:k]
+            instructions[i]=instructions[i][k+1:]
             if (k > 0):
-                instructions[i]=instructions[i].strip()
-                label_position[instructions[i][:k-1]]=i
+                label_position[label]=i
 
         for i in range(0, n):
             instructions[i]=instructions[i].replace(',', ' ')
@@ -223,6 +225,10 @@ if file_read.mode=='r':
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'I'):
                 file_write.write(pc)
+                if(mnemonic_fmt[words[0]][0] == 'lb'):
+                    pass
+                elif(mnemonic_fmt[words[0]][0] == 'lw'):
+                    pass
                 print('0x' + '{0:08x}'.format(int(I_type(words), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(I_type(words), 2)))
                 file_write.write('\n')
@@ -250,14 +256,3 @@ if file_read.mode=='r':
 
     else:
         pass
-
-
-# if file_read.mode == 'r':
-#     asm_code=file_read.read()
-#     instructions=asm_code.split('\n')
-#     for line in instructions:
-#         line=line.replace(', ',' ')
-#         line=line.replace(' ,',' ')
-#         line=line.replace(',',' ')
-#         words=line.split(' ')
-#         print(words)
