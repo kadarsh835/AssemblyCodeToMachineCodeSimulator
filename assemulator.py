@@ -203,28 +203,38 @@ if file_read.mode=='r':
         instructions = list(filter(bool, text.splitlines()))
         # Assuming there is no extra '\n' in the text part of the code
         n=len(instructions)
+        i=0
         
         label_position={}
-        for i in range(0, n):
+        while(i<n):
             instructions[i]=instructions[i].strip()
+            a=instructions[i].find('#')
+            if(a==0):
+                del instructions[i]
+                n=n-1
+                continue
+            elif(a>0):
+                instructions[i]=instructions[i][0:a]
+
             k=instructions[i].find(':')
             label=instructions[i][:k]
             instructions[i]=instructions[i][k+1:]
             if (k > 0):
                 label_position[label]=i
+            i=i+1
 
+        pc=0
         for i in range(0, n):
             instructions[i]=instructions[i].replace(',', ' ')
             words=instructions[i].split()
 
-            pc=hex(i*4)+' '
             if(mnemonic_fmt[words[0]][0] == 'R'):
-                file_write.write(pc)
+                file_write.write(hex(pc)+' ')
                 print('0x' + '{0:08x}'.format(int(R_type(words), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(R_type(words), 2)))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'I'):
-                file_write.write(pc)
+                file_write.write(hex(pc)+' ')
                 if(mnemonic_fmt[words[0]][0] == 'lb'):
                     pass
                 elif(mnemonic_fmt[words[0]][0] == 'lw'):
@@ -233,26 +243,27 @@ if file_read.mode=='r':
                 file_write.write('0x' + '{0:08x}'.format(int(I_type(words), 2)))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'S'):
-                file_write.write(pc)
+                file_write.write(hex(pc)+' ')
                 print('0x' + '{0:08x}'.format(int(S_type(words), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(S_type(words), 2)))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'SB'):
                 var=(label_position[words[3]]-i)*4
-                file_write.write(pc)
+                file_write.write(hex(pc)+' ')
                 print('0x' + '{0:08x}'.format(int(SB_type(words, var), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(SB_type(words, var))))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'U'):
-                file_write.write(pc)
+                file_write.write(hex(pc)+' ')
                 print('0x' + '{0:08x}'.format(int(U_type(words, '10101'), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(U_type(words, '10101'), 2)))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'UJ'):
-                file_write.write(pc)
+                file_write.write(hex(pc)+' ')
                 print('0x' + '{0:08x}'.format(int(UJ_type(words, '10101'), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(UJ_type(words, '10101'), 2)))
                 file_write.write('\n')
+            pc=pc+4
 
     else:
         pass
