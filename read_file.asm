@@ -1,18 +1,9 @@
 .data
-arr: .word 1 2 3
-
-
-arr2: .word 10 20 3
-
+var: .word 5
+var2: .byte 46
+var3: .word 245
 .text
-addi x11 x0 3
-
-
-add x12 x0 x11  #after instruction comment
-
-#this is comment
-    # another comment
-
-addi x20 x0 -45
-
-sub x5 x20 x12
+lw x5 var
+add x4 x0 x0
+lb x6 var2
+addi x7 x0 4
