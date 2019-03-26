@@ -100,7 +100,7 @@ def S_type(words):
     #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
-    rs1='{0:05b}'.format(int(words[1][1:]))
+    rs2='{0:05b}'.format(int(words[1][1:]))
 
     temp_str=''
     # third word should be in the format like 986(x7)
@@ -109,7 +109,8 @@ def S_type(words):
 
     offset = temp_str[0:temp_str.find('(')]
     # handling of -ve offset left
-    rs2=temp_str[temp_str.find('(')+2:temp_str.find(')')]
+    rs1=int(temp_str[temp_str.find('(')+2:temp_str.find(')')])
+    rs1='{0:05b}'.format(rs1)
 
     imm=''
     if(offset[0:2] == '0x'):
@@ -134,14 +135,24 @@ def SB_type(words, label_offset):
 
     imm=BitArray(int=int(str(label_offset)), length=12).bin
 
-    machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
+    machine_code = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
     return machine_code
 
-def U_type(words, var_address):
+def U_type(words):
     #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     rd='{0:05b}'.format(int(words[1][1:]))
+    var_address = ''
     
+    if(words[2][0:2] == '0x'):
+        var_address='{0:020b}'.format(int(words[2][2:], 16))
+
+    elif(words[2][0:2] == '0b'):
+        var_address='{0:020b}'.format(int(words[2][2:], 2))
+        
+    else:
+        var_address=BitArray(int=int(words[2]), length=20).bin
+
     machine_code = var_address + rd + opcode
     return machine_code
 
@@ -217,9 +228,15 @@ if file_read.mode=='r':
                 instructions[i]=instructions[i][0:a]
 
             k=instructions[i].find(':')
-            label=instructions[i][:k]
-            instructions[i]=instructions[i][k+1:]
             if (k > 0):
+                instructions[i]=instructions[i].strip()
+                label=instructions[i][:k]
+                if(len(instructions[i][k+1:]) > 0):
+                    instructions[i]=instructions[i][k+1:]
+                else:
+                    del instructions[i]
+                    i=i-1
+                    n=n-1
                 label_position[label]=i
             i=i+1
 
@@ -242,9 +259,9 @@ if file_read.mode=='r':
                     #if using a data label:
                     
                     if words[2] in dictionary:
-                        words_extra=['auipc',words[1],'00010000000000000000']
-                        print('0x' + '{0:08x}'.format(int(U_type(words_extra,'00010000000000000000'), 2)))
-                        file_write.write('0x' + '{0:08x}'.format(int(U_type(words_extra,'00010000000000000000'), 2)))
+                        words_extra=['auipc',words[1],'0b00010000000000000000']
+                        print('0x' + '{0:08x}'.format(int(U_type(words_extra), 2)))
+                        file_write.write('0x' + '{0:08x}'.format(int(U_type(words_extra), 2)))
                         file_write.write('\n')
                         new_offset=BitArray(int=int(dictionary[words[2]], 16)-int('0x10000000', 16)-pc, length=12).bin
                         #print('jkhj   ', int(dictionary[words[2]], 16)-int('0x10000000', 16)-pc)
@@ -280,15 +297,15 @@ if file_read.mode=='r':
                 file_write.write('0x' + '{0:08x}'.format(int(S_type(words), 2)))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'SB'):
-                var=(label_position[words[3]]-i)*4
+                var=(label_position[words[3]])*4-pc
                 file_write.write(hex(pc)+' ')
                 print('0x' + '{0:08x}'.format(int(SB_type(words, var), 2)))
                 file_write.write('0x' + '{0:08x}'.format(int(SB_type(words, var))))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'U'):
                 file_write.write(hex(pc)+' ')
-                print('0x' + '{0:08x}'.format(int(U_type(words, '10101'), 2)))
-                file_write.write('0x' + '{0:08x}'.format(int(U_type(words, '10101'), 2)))
+                print('0x' + '{0:08x}'.format(int(U_type(words), 2)))
+                file_write.write('0x' + '{0:08x}'.format(int(U_type(words), 2)))
                 file_write.write('\n')
             elif(mnemonic_fmt[words[0]][0] == 'UJ'):
                 file_write.write(hex(pc)+' ')
