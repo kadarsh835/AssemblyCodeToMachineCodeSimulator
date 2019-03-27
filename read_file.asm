@@ -1,2 +1,9 @@
-addi x10 x0 78
-add x11 x10 x0
+.data
+var: .word 10
+var2: .word 11
+
+
+
+.text
+lw x5 var
+add x6 x5 x0
