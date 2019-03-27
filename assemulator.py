@@ -64,43 +64,72 @@ mnemonic_fmt = {
 }
 
 def R_type(words):
-    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
     funct7=mnemonic_fmt[words[0]][3]
 
-    rd='{0:05b}'.format(int(words[1][1:]))
-    rs1='{0:05b}'.format(int(words[2][1:]))
-    rs2='{0:05b}'.format(int(words[3][1:]))
-
-    machine_code=funct7 + rs2 + rs1 + funct3 + rd + opcode
-    return machine_code
+    try:
+        rd='{0:05b}'.format(int(words[1][1:]))
+    except:
+        print('problem in getting \'rd\' in R_type in ',words)
+    try:
+        rs1='{0:05b}'.format(int(words[2][1:]))
+    except:
+        print('problem in getting \'rs1\' in R_type in ',words)
+    try:
+        rs2='{0:05b}'.format(int(words[3][1:]))
+    except:
+        print('problem in getting \'rs2\' in R_type in ',words)
+    try:
+        machine_code=funct7 + rs2 + rs1 + funct3 + rd + opcode
+        return machine_code
+    except:
+        print('problem in generating machine_code in R_type in ',words)
 
 def I_type(words):
-    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
-    rd='{0:05b}'.format(int(words[1][1:]))
-    rs1='{0:05b}'.format(int(words[2][1:]))
+    try:
+        rd='{0:05b}'.format(int(words[1][1:]))
+    except:
+        print('problem in getting \'rd\' in I_type in ',words)
+    try:
+        rs1='{0:05b}'.format(int(words[2][1:]))
+    except:
+        print('problem in getting \'rd\' in I_type in ',words)
     imm=''
 
     if(words[3][0:2] == '0x'):
-        imm='{0:012b}'.format(int(words[3][2:], 16))
+        try:
+            imm='{0:012b}'.format(int(words[3][2:], 16))
+        except:
+            print('problem in getting hexadecimal immediate value in I_type in ',words)
 
     elif(words[3][0:2] == '0b'):
-        imm='{0:012b}'.format(int(words[3][2:], 2))
+        try:
+            imm='{0:012b}'.format(int(words[3][2:], 2))
+        except:
+            print('problem in getting binary immediate value in I_type in ',words)
 
     else:
-        imm=BitArray(int=int(words[3]), length=12).bin
+        try:
+            imm=BitArray(int=int(words[3]), length=12).bin
+        except:
+            print('problem in getting other type of immediate value in I_type in ',words)
 
-    machine_code = imm + rs1 + funct3 + rd + opcode
-    return machine_code
+    try:
+        machine_code = imm + rs1 + funct3 + rd + opcode
+        return machine_code
+    except:
+        print('problem in generating machine code in I_type in ',words)
 
 def S_type(words):
-    #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
-    rs2='{0:05b}'.format(int(words[1][1:]))
+    try:
+        rs2='{0:05b}'.format(int(words[1][1:]))
+    except:
+        print('problem in getting \'rs2\' in S_type in ',words)
 
     temp_str=''
     # third word should be in the format like 986(x7)
@@ -109,60 +138,112 @@ def S_type(words):
 
     offset = temp_str[0:temp_str.find('(')]
     # handling of -ve offset left
-    rs1=int(temp_str[temp_str.find('(')+2:temp_str.find(')')])
-    rs1='{0:05b}'.format(rs1)
+    try:
+        rs1=int(temp_str[temp_str.find('(')+2:temp_str.find(')')])
+        rs1='{0:05b}'.format(rs1)
+    except:
+        print('problem in getting \'rs1\' in S_type in ',words)
 
     imm=''
     if(offset[0:2] == '0x'):
-        imm='{0:012b}'.format(int(offset[2:], 16))
+        try:
+            imm='{0:012b}'.format(int(offset[2:], 16))
+        except:
+            print('problem in getting hexadecimal immediate value in S_type in ',words)
 
     elif(offset[0:2] == '0b'):
-        imm='{0:012b}'.format(int(offset[2:], 2))
+        try:
+            imm='{0:012b}'.format(int(offset[2:], 2))
+        except:
+            print('problem in getting binary immediate value in S_type in ',words)
         
     else:
-        imm=BitArray(int=int(offset), length=12).bin
+        try:
+            imm=BitArray(int=int(offset), length=12).bin
+        except:
+            print('problem in getting other type of immediate value in S_type in ',words)
 
-    machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
-    return machine_code
+    try:
+        machine_code = imm[0:7] + rs2 + rs1 + funct3 + imm[7:12] + opcode
+        return machine_code
+    except:
+        print('problem in generating machine_code in S_type in ',words)
 
 
 def SB_type(words, label_offset):
     #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
     funct3=mnemonic_fmt[words[0]][2]
-    rs1='{0:05b}'.format(int(words[1][1:]))
-    rs2='{0:05b}'.format(int(words[2][1:]))
+    try:
+        rs1='{0:05b}'.format(int(words[1][1:]))
+    except:
+        print('problem in getting \'rs1\' in SB_type in ',words)
 
-    imm=BitArray(int=int(str(label_offset)), length=12).bin
+    try:
+        rs2='{0:05b}'.format(int(words[2][1:]))
+    except:
+        print('problem in getting \'rs2\' in SB_type in ',words)
 
-    machine_code = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
-    return machine_code
+    try:
+        imm=BitArray(int=int(str(label_offset)), length=12).bin
+    except:
+        print('problem in generating immediate in SB_type in ',words)
+
+    try:
+        machine_code = imm[0] + imm[2:8] + rs2 + rs1 + funct3 + imm[8:12] + imm[1] + opcode
+        return machine_code
+    except:
+        print('problem in generating machine_code in SB_type in ',words)
 
 def U_type(words):
     #words=instruction.split()
     opcode=mnemonic_fmt[words[0]][1]
-    rd='{0:05b}'.format(int(words[1][1:]))
+    try:
+        rd='{0:05b}'.format(int(words[1][1:]))
+    except:
+        print('problem in getting \'rd\' in U_type in ',words)
     var_address = ''
     
     if(words[2][0:2] == '0x'):
-        var_address='{0:020b}'.format(int(words[2][2:], 16))
+        try:
+            var_address='{0:020b}'.format(int(words[2][2:], 16))
+        except:
+            print('problem in getting hexadecimal var_address in U_type in ',words)
 
     elif(words[2][0:2] == '0b'):
-        var_address='{0:020b}'.format(int(words[2][2:], 2))
+        try:
+            var_address='{0:020b}'.format(int(words[2][2:], 2))
+        except:
+            print('problem in getting binary var_address in U_type in ',words)
         
     else:
-        var_address=BitArray(int=int(words[2]), length=20).bin
+        try:
+            var_address=BitArray(int=int(words[2]), length=20).bin
+        except:
+            print('problem in getting other type of var_address in U_type in ',words)
 
-    machine_code = var_address + rd + opcode
-    return machine_code
+    try:
+        machine_code = var_address + rd + opcode
+        return machine_code
+    except:
+        print('problem in generating machine_code in U_type in ',words)
 
-def UJ_type(words, label_address):  #write immediate in proper format
-#    words=instruction.split()
+def UJ_type(words, label_address):
     opcode=mnemonic_fmt[words[0]][1]
-    rd='{0:05b}'.format(int(words[1][1:]))
-    label_address='{0:021b}'.format(int(label_address))
-    machine_code = label_address[0] + label_address[10:20] + label_address[9] + label_address[1:9] + rd + opcode ##to be corrected and checked
-    return machine_code
+    try:
+        rd='{0:05b}'.format(int(words[1][1:]))
+    except:
+        print('problem in getting \'rd\' in UJ_type in ',words)
+
+    try:
+        label_address='{0:021b}'.format(int(label_address))
+    except:
+        print('problem in getting label_address in UJ_type in ',words)
+    try:
+        machine_code = label_address[0] + label_address[10:20] + label_address[9] + label_address[1:9] + rd + opcode ##to be corrected and checked
+        return machine_code
+    except:
+        print('problem in generating machine_code in UJ_type in ',words)
 
 file_write= open("write_file.mc","w")
 file_read = open("read_file.asm","r")
