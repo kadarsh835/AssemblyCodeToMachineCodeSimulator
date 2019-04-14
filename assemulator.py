@@ -244,6 +244,24 @@ def UJ_type(words, label_address):
         return machine_code
     except:
         print('problem in generating machine_code in UJ_type in ',words)
+def stripComments(code):
+    instructions = list(filter(bool, code.splitlines()))
+    n=len(instructions)
+    i=0
+    new_code=''
+
+    while(i<n):
+        instructions[i]=instructions[i].strip()
+        a=instructions[i].find('#')
+        if(a==0):
+            del instructions[i]
+            n=n-1
+            continue
+        elif(a>0):
+            instructions[i]=instructions[i][0:a]
+        new_code=new_code+instructions[i]+'\n'
+        i=i+1
+    return new_code
 def mc_generator(asm_text=""):
     file_write= open("write_file.mc","w")
     file_read = open("read_file.asm","r")
@@ -254,6 +272,7 @@ def mc_generator(asm_text=""):
         # .data and .text part of the code can come in any order
     else:
         asm_code=asm_text
+    asm_code=stripComments(asm_code)
     dictionary = {}                                                                 #Declaration of a dictionary(to be used later as reference to memory addresses)
     if(asm_code.find('.data') >= 0):
         data = ''
@@ -384,12 +403,6 @@ def mc_generator(asm_text=""):
     else:
         return return_txt
 if __name__ == "__main__":
-    abc=mc_generator('''.data
-var: .word 10
-var2: .word 11
-
-
-
-.text
-lw x5 var
-add x6 x5 x0''')
+    abc=''
+    abc=mc_generator()
+    print(abc)
